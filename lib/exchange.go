@@ -57,13 +57,21 @@ func (u ExchangePlugin) FetchMetrics() (map[string]float64, error) {
 	const interval = time.Hour * 2
 	const errorValue = 200.0
 
-	if !isOverTime(path, interval) {
-		return map[string]float64{"USD": errorValue, "EUR": errorValue}, fmt.Errorf("Intentionally not sent")
+	isOverTime, err := isOverTime(path, interval)
+	if err != nil {
+		return map[string]float64{"USD": errorValue, "EUR": errorValue}, fmt.Errorf("isOverTime() Error: %s", err)
 	}
 
-	writeTimestamp(path)
+	if !isOverTime {
+		return map[string]float64{"USD": errorValue, "EUR": errorValue}, fmt.Errorf("INTENTIONALLY NOT SENT")
+	}
 
-	err := godotenv.Load("/Users/wafuwafu13/Desktop/mackerel-plugin-exchange/.env")
+	err = writeTimestamp(path)
+	if err != nil {
+		return map[string]float64{"USD": errorValue, "EUR": errorValue}, fmt.Errorf("writeTimestamp() Error: %s", err)
+	}
+
+	err = godotenv.Load("/Users/wafuwafu13/Desktop/mackerel-plugin-exchange/.env")
 	if err != nil {
 		return map[string]float64{"USD": errorValue, "EUR": errorValue}, fmt.Errorf("godotenv.Load Error: %s", err)
 	}
@@ -99,11 +107,10 @@ func (u ExchangePlugin) FetchMetrics() (map[string]float64, error) {
 }
 
 // isOverTime checks if the last timestamp in the file is more than interval
-func isOverTime(path string, interval time.Duration) bool {
+func isOverTime(path string, interval time.Duration) (bool, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return false
+		return false, err
 	}
 	defer file.Close()
 
@@ -114,31 +121,30 @@ func isOverTime(path string, interval time.Duration) bool {
 	}
 
 	if lastLine == "" {
-		return true
+		return true, nil
 	}
 
 	lastTimestamp, err := time.Parse("2006-01-02 15:04:05", lastLine)
 	if err != nil {
-		fmt.Println("Error parsing timestamp:", err)
-		return false
+		return false, err
 	}
 
-	return time.Now().UTC().Sub(lastTimestamp.UTC()) >= interval
+	return time.Now().UTC().Sub(lastTimestamp.UTC()) >= interval, nil
 }
 
 // writeTimestamp writes the current timestamp to the file
-func writeTimestamp(path string) {
+func writeTimestamp(path string) error {
 	file, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return
+		return err
 	}
 	defer file.Close()
 
 	_, err = file.WriteString(time.Now().UTC().Format("2006-01-02 15:04:05") + "\n")
 	if err != nil {
-		fmt.Println("Error writing to file:", err)
+		return err
 	}
+	return nil
 }
 
 // Do the plugin

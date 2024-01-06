@@ -1,3 +1,5 @@
+github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
+github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
 github.com/mackerelio/go-mackerel-plugin v0.1.4 h1:+kyatPMFSoghKd7o9oge1FnDrVknFbiwz5VWdFIgsqY=
 github.com/mackerelio/go-mackerel-plugin v0.1.4/go.mod h1:bau0bZbR1JXiCwDIg880djjttZ/0j885v5k0n+jAS/I=
 github.com/mackerelio/golib v1.2.1 h1:SDcDn6Jw3p9bi1N0bg1Z/ilG5qcBB23qL8xNwrU0gg4=

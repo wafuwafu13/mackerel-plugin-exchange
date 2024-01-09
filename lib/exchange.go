@@ -32,7 +32,7 @@ func (u ExchangePlugin) MetricKeyPrefix() string {
 func (u ExchangePlugin) GraphDefinition() map[string]mp.Graphs {
 	labelPrefix := cases.Title(language.Und, cases.NoLower).String(u.Prefix)
 	return map[string]mp.Graphs{
-		"": {
+		"Exchange Rate": {
 			Label: labelPrefix,
 			Unit:  mp.UnitFloat,
 			Metrics: []mp.Metrics{
